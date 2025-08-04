@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#Daag</title>
+    <style>
+        body {
+            background: #0C0C0C
+        }
+
+        .time {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #f2709c;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #ff9472, #f2709c);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #ff9472, #f2709c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-size: clamp(1.5rem, -0.107rem + 4.286vw, 3.75rem);
+        font-weight: bold;
+        text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="time"></div>
+    <script>
+        // ============================
+        // Configuration Variables
+        // ============================
+        const CONFIG = {
+            targetDate: '2026-02-03T00:00:00Z', // Target date for the timer
+            timerElementsClass: '.time',        // CSS class for timer display elements
+            timeUpMessage: "Happy Marraige day Love!!!!",        // Message when the timer hits zero
+            leadingZeros: true                // Add leading zeros to time units
+        };
+
+        // ============================
+        // Helper Functions
+        // ============================
+
+        // Function to format time with or without leading zeros
+        function formatTime(unit) {
+            return CONFIG.leadingZeros ? (unit < 10 ? "0" + unit : unit) : unit;
+        }
+
+        // Function to update the time display
+        function updateTime(timer, display) {
+            const SECONDS_IN_DAY = 86400;
+            const SECONDS_IN_HOUR = 3600;
+            const SECONDS_IN_MINUTE = 60;
+
+            const days = Math.floor(timer / SECONDS_IN_DAY);
+            const hours = Math.floor((timer % SECONDS_IN_DAY) / SECONDS_IN_HOUR);
+            const minutes = Math.floor((timer % SECONDS_IN_HOUR) / SECONDS_IN_MINUTE);
+            const seconds = Math.floor(timer % SECONDS_IN_MINUTE);
+
+            // Build the time string
+            const timeString = `${formatTime(days)}d ${formatTime(hours)}h ${formatTime(minutes)}m ${formatTime(seconds)}s`;
+
+            // Update each display element
+            display.forEach(el => el.textContent = timeString);
+        }
+
+        // Function to start the countdown timer
+        function startTimer(duration, display) {
+            let timer = duration;
+
+            // Initial display
+            updateTime(timer, display);
+
+            const intervalID = setInterval(() => {
+                if (timer <= 0) {
+                    clearInterval(intervalID);
+                    display.forEach(el => el.textContent = CONFIG.timeUpMessage);
+                } else {
+                    timer--;
+                    updateTime(timer, display);
+                }
+            }, 1000);
+        }
+
+        // Function to calculate seconds until a target date
+        function getTimeUntilTarget(targetDate) {
+            const now = Date.now();
+            const target = new Date(targetDate).getTime();
+            return Math.max(Math.floor((target - now) / 1000), 0); // Ensure non-negative duration
+        }
+
+        // ============================
+        // Main Script
+        // ============================
+        window.onload = function () {
+            const displayElements = document.querySelectorAll(CONFIG.timerElementsClass);
+            if (displayElements.length > 0) {
+                const duration = getTimeUntilTarget(CONFIG.targetDate);
+                startTimer(duration, displayElements);
+            }
+        };
+
+    </script>
+</body>
+</html>
